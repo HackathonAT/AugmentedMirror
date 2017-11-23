@@ -42,7 +42,7 @@ namespace LiveCameraSample
             }
         }
 
-        public static List<int> AllIndexesOf(string str, string value)
+        private static List<int> AllIndexesOf(string str, string value)
         {
             if (String.IsNullOrEmpty(value))
                 throw new ArgumentException("the string to find may not be empty", "value");
@@ -56,7 +56,7 @@ namespace LiveCameraSample
             }
         }
 
-        public static String GetHybrisRequest(String query)
+        private static String GetHybrisRequest(String query)
         {
             // Create a request for the URL. 
             WebRequest request = WebRequest.Create(query);

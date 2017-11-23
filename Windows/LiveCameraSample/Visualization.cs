@@ -74,6 +74,21 @@ namespace LiveCameraSample
             return outputBitmap;
         }
 
+        //TODO Hackathon: provide a function to draw the ad here
+        public static BitmapSource DrawAds(BitmapSource baseImage, BitmapSource bmp)
+        {
+        
+            Action<DrawingContext, double> drawAction = (drawingContext, annotationScale) =>
+            {
+                double y = 0;
+                
+                y += 42 * annotationScale;
+                
+            };
+
+            return bmp;
+        }
+
         public static BitmapSource DrawTags(BitmapSource baseImage, Tag[] tags)
         {
             if (tags == null)
