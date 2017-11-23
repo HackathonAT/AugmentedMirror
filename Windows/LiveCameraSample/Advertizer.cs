@@ -22,6 +22,11 @@ namespace LiveCameraSample
          * "MRO-F00-20" for females under 20
          * "MRO-F20-40" for females between 20 and 40
          * "MRO-F40-60" for females over 40
+         * 
+         * "MRO-M-RG--" Male with Reading Glasses
+         * "MRO-F-RG--" Female with Reading Glasses
+         * "MRO-M-SG--" Male with Sunglasses
+         * "MRO-F-SG--" Female with Sunglasses
          * If you invoke the GetHybrisData("MRO-M20-40"), the method will return a String containing the URL 
          *    of an image of the ad for middle aged men.
          */
@@ -30,19 +35,28 @@ namespace LiveCameraSample
         internal static void ShowHybrisAdvertizing(Microsoft.ProjectOxford.Face.Contract.FaceAttributes faceAttributes)
         {
             //Hackathon: call this method with the information from Azure Face API, create a Request to Hybris and show the ad.
-            String targetGroup = GetTargetGroup(faceAttributes.Age, faceAttributes.Gender);
+            String targetGroup = GetTargetGroup(faceAttributes.Age, faceAttributes.Gender, faceAttributes.Glasses);
             String hybrisResponseImageURL = HybrisRest.GetHybrisData(targetGroup);
             Console.WriteLine("Showing Ad from URL: " + hybrisResponseImageURL);
             ShowAd(hybrisResponseImageURL);
         }
 
-        internal static String GetTargetGroup(double exactAge, String gender)
+        internal static String GetTargetGroup(double exactAge, String gender, Microsoft.ProjectOxford.Face.Contract.Glasses glasses)
         {
             //Hackathon: prepare the Target-Group-String for the Hybris REST call: HybrisRest.GetHybrisData(Target-Group-String)
             String prefix = "MRO-";
             String genderSyllable = gender.ToLower().StartsWith("m") ? "M" : "F";
             String ageGroup = "";
 
+            if ((int)glasses == 1)
+            {
+                return prefix + genderSyllable + "-RG--";
+            }
+            else if ((int)glasses == 2)
+            {
+                return prefix + genderSyllable + "-SG--";
+            }
+                
             if (exactAge < 20)
             {
                 ageGroup = "00-20";
