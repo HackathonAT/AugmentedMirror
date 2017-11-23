@@ -50,11 +50,11 @@ namespace LiveCameraSample
 
             if ((int)glasses == 1)
             {
-                return prefix + genderSyllable + "-RG--";
+                return prefix + genderSyllable + "-SG--";
             }
             else if ((int)glasses == 2)
             {
-                return prefix + genderSyllable + "-SG--";
+                return prefix + genderSyllable + "-RG--";
             }
                 
             if (exactAge < 20)
