@@ -178,9 +178,23 @@ namespace LiveCameraSample
             var jpg = frame.Image.ToMemoryStream(".jpg", s_jpegParams);
             //TODO Hackathon:
             // Submit image to API. 
+            var result = new LiveCameraResult();
+            try
+            {
+                var attrs = new List<FaceAttributeType> { FaceAttributeType.Age, FaceAttributeType.Gender, FaceAttributeType.HeadPose, FaceAttributeType.Glasses };
+                result.Faces = await _faceClient.DetectAsync(jpg, returnFaceAttributes: attrs);
+            }
+            catch (FaceAPIException faceException)
+            {
+                MessageBox.Show(faceException.ErrorMessage, faceException.ErrorCode);
+            }
+
+
             // Count the API call. 
+            Properties.Settings.Default.FaceAPICallCount++;
             // Output. 
-            return null;
+            
+            return result;
         }
 
         /// <summary> Function which submits a frame to the Emotion API. </summary>
@@ -193,15 +207,55 @@ namespace LiveCameraSample
             var jpg = frame.Image.ToMemoryStream(".jpg", s_jpegParams);
 
             //TODO Hackathon:
-            // Submit image to API. 
-            // See if we have local face detections for this image.
-            // If localFaces is null, we're not performing local face detection.
+
+            Emotion[] emotionResult = null;
+            try
+            {
+                // See if we have local face detections for this image.
+                // If localFaces is null, we're not performing local face detection.
+
+                var localFaces = frame.UserData as OpenCvSharp.Rect[];
+
+                if (localFaces != null && localFaces.Length > 0)
+                {
+                    var rects = localFaces.Select(f => new Microsoft.ProjectOxford.Common.Rectangle
+                    {
+                        Left = f.Left,
+                        Top = f.Top,
+                        Width = f.Width,
+                        Height = f.Height
+                    });
+                    emotionResult = await _emotionClient.RecognizeAsync(jpg, rects.ToArray());
+                    
+                }
+                else
+                {
+                    // Submit image to API. 
+                    emotionResult = await _emotionClient.RecognizeAsync(jpg);
+                    
+                }
+                Properties.Settings.Default.EmotionAPICallCount++;
+                //emotionResult = await _emotionClient.RecognizeAsync(jpg);
+                //Properties.Settings.Default.EmotionAPICallCount++;
+
+            }
+            catch (Exception e)
+            {
+
+                MessageBox.Show(e.ToString());
+            }
+
+
             // Use Cognigitve Services to do the face detection.
             // If we have local face detections, we can call the API with them. 
             // First, convert the OpenCvSharp rectangles. 
             // else: Local face detection found no faces; don't call Cognitive Services.
             // Output. 
-            return null;
+            return new LiveCameraResult()
+            {
+                Faces = emotionResult.Select(e => CreateFace(e.FaceRectangle)).ToArray(),
+                EmotionScores = emotionResult.Select(e => e.Scores).ToArray()
+            };
         }
 
         /// <summary> Function which submits a frame to the Computer Vision API for tagging. </summary>
@@ -216,7 +270,18 @@ namespace LiveCameraSample
             // Submit image to API. 
             // Count the API call. 
             // Output. return null is just a dummy.
-            return null; 
+            var result = new LiveCameraResult();
+            try
+            {
+                var tagsResult = await _visionClient.GetTagsAsync(jpg);
+                result.Tags = tagsResult.Tags;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.ToString());
+            }
+
+            return result; 
         }
 
 
@@ -322,7 +387,9 @@ namespace LiveCameraSample
             // Create API clients. 
             _faceClient = new FaceServiceClient(Properties.Settings.Default.FaceAPIKey, Properties.Settings.Default.FaceAPIHost);
             _emotionClient = new EmotionServiceClient(Properties.Settings.Default.EmotionAPIKey, Properties.Settings.Default.EmotionAPIHost);
+            
             _visionClient = new VisionServiceClient(Properties.Settings.Default.VisionAPIKey, Properties.Settings.Default.VisionAPIHost);
+            
 
             // How often to analyze. 
             _grabber.TriggerAnalysisOnInterval(Properties.Settings.Default.AnalysisInterval);
