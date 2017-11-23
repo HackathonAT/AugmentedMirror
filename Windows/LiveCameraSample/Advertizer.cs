@@ -6,6 +6,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
@@ -13,27 +14,38 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 namespace LiveCameraSample
 {
-    /**
-         * TODO Hackathon: call this Method for the hybris connection
-         * There are currently 6 different ads defined in Hybris: 
-         * "MRO-M00-20" for males under 20
-         * "MRO-M20-40" for males between 20 and 40
-         * "MRO-M40-60" for males over 40
-         * "MRO-F00-20" for females under 20
-         * "MRO-F20-40" for females between 20 and 40
-         * "MRO-F40-60" for females over 40
-         * If you invoke the GetHybrisData("MRO-M20-40"), the method will return a String containing the URL 
-         *    of an image of the ad for middle aged men.
-         */
+
     static class Advertizer
     {
-        internal static void ShowHybrisAdvertizing(Microsoft.ProjectOxford.Face.Contract.FaceAttributes faceAttributes)
+
+        private static async Task<string> GetTargetGroupTask(String targetGroup)
+        {
+            return await Task.Run(() => HybrisRest.GetHybrisData(targetGroup));
+            
+        }
+
+        internal static void ShowHybrisAdvertizing(Microsoft.ProjectOxford.Face.Contract.FaceAttributes faceAttributes, System.Windows.Controls.Image viewImage)
         {
             //Hackathon: call this method with the information from Azure Face API, create a Request to Hybris and show the ad.
             String targetGroup = GetTargetGroup(faceAttributes.Age, faceAttributes.Gender);
+
+            //String hybrisResponseImageURL =  HybrisRest.GetHybrisData(targetGroup);
+
+            //new Thread(() =>
+            //{
+            //    String hybrisResponseImageURL = HybrisRest.GetHybrisData(targetGroup);
+            //    Console.WriteLine("Showing Ad from URL: " + hybrisResponseImageURL);
+            //    ShowAd(hybrisResponseImageURL, viewImage);
+            //}).Start();
             String hybrisResponseImageURL = HybrisRest.GetHybrisData(targetGroup);
             Console.WriteLine("Showing Ad from URL: " + hybrisResponseImageURL);
-            ShowAd(hybrisResponseImageURL);
+            ShowAd(hybrisResponseImageURL, viewImage);
+
+
+            //Task<String> hybrisResponseImageURL = GetTargetGroupTask(targetGroup);
+            //Console.WriteLine("Showing Ad from URL: " + hybrisResponseImageURL);
+            //ShowAd(hybrisResponseImageURL., viewImage);
+
         }
 
         internal static String GetTargetGroup(double exactAge, String gender)
@@ -62,38 +74,43 @@ namespace LiveCameraSample
             return prefix + genderSyllable + ageGroup;
         }
 
-        internal static void ShowAd(String hybrisResponse)
+        internal static void ShowAd(String hybrisResponse, System.Windows.Controls.Image viewImage)
         {
             //TODO Hackathon: show the ad in the user interface.
-            System.Net.WebClient client = new System.Net.WebClient();
-            Stream stream = client.OpenRead(hybrisResponse);
-            Bitmap bitmap; bitmap = new Bitmap(stream);
-            BitmapSource bitmapSource = null;
+            //System.Net.WebClient client = new System.Net.WebClient();
+            //Stream stream = client.OpenRead(hybrisResponse);
+            //Bitmap bitmap; bitmap = new Bitmap(stream);
+            //BitmapSource bitmapSource = null;
 
 
-            if (bitmap != null)
-            {
-                Console.WriteLine("Bitmap not null! " + bitmap.Size.ToString());
-                BitmapData bitmapData = bitmap.LockBits(
-                    new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
-                    System.Drawing.Imaging.ImageLockMode.ReadOnly, bitmap.PixelFormat);
+            //if (bitmap != null)
+            //{
+            //    Console.WriteLine("Bitmap not null! " + bitmap.Size.ToString());
+            //    BitmapData bitmapData = bitmap.LockBits(
+            //        new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
+            //        System.Drawing.Imaging.ImageLockMode.ReadOnly, bitmap.PixelFormat);
 
-                bitmapSource = BitmapSource.Create(
-                    bitmapData.Width, bitmapData.Height,
-                    bitmap.HorizontalResolution, bitmap.VerticalResolution,
-                    PixelFormats.Bgr24, null,
-                    bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
+            //    bitmapSource = BitmapSource.Create(
+            //        bitmapData.Width, bitmapData.Height,
+            //        bitmap.HorizontalResolution, bitmap.VerticalResolution,
+            //        PixelFormats.Bgr24, null,
+            //        bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
 
-                bitmap.UnlockBits(bitmapData);
+            //    bitmap.UnlockBits(bitmapData);
 
                 //TODO Hackathon display image
-                //Visualization.DrawAds(???, bitmapSource);
-            }
+                Visualization.DrawAds(viewImage, new BitmapImage(new Uri(hybrisResponse)));
+                //viewImage.Source = ;
+
+                
 
 
-            stream.Flush();
-            stream.Close();
-            client.Dispose();
+            //}
+
+
+            //stream.Flush();
+            //stream.Close();
+            //client.Dispose();
         }
     }
 }

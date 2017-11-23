@@ -57,6 +57,9 @@ namespace LiveCameraSample
     /// </summary>
     public partial class MainWindow : System.Windows.Window
     {
+        [ThreadStatic]
+        public static bool showingAd = false; 
+
         private EmotionServiceClient _emotionClient = null;
         private FaceServiceClient _faceClient = null;
         private VisionServiceClient _visionClient = null;
@@ -67,6 +70,7 @@ namespace LiveCameraSample
         private readonly CascadeClassifier _localFaceDetector = new CascadeClassifier();
         private bool _fuseClientRemoteResults;
         private LiveCameraResult _latestResultsToDisplay = null;
+        
         private AppMode _mode;
         private DateTime _startTime;
 
@@ -80,6 +84,7 @@ namespace LiveCameraSample
 
         public MainWindow()
         {
+            
             InitializeComponent();
 
             // Create grabber. 
@@ -105,8 +110,9 @@ namespace LiveCameraSample
 
                     // If we're fusing client-side face detection with remote analysis, show the
                     // new frame now with the most recent analysis available. 
-                    if (_fuseClientRemoteResults)
+                    if (_fuseClientRemoteResults && !showingAd)
                     {
+
                         RightImage.Source = VisualizeResult(e.Frame);
                     }
                 }));
@@ -155,8 +161,16 @@ namespace LiveCameraSample
                     {
                         _latestResultsToDisplay = e.Analysis;
 
+                        //**************************************************************
+                        //added
+                        if(_latestResultsToDisplay.Faces != null && _latestResultsToDisplay.Faces.Length > 0)
+                        {
+                            Advertizer.ShowHybrisAdvertizing(_latestResultsToDisplay.Faces[0].FaceAttributes, RightImage);
+                        }
+                            
+
                         // Display the image and visualization in the right pane. 
-                        if (!_fuseClientRemoteResults)
+                        if (!_fuseClientRemoteResults && !showingAd)
                         {
                             RightImage.Source = VisualizeResult(e.Frame);
                         }
@@ -235,8 +249,6 @@ namespace LiveCameraSample
                     
                 }
                 Properties.Settings.Default.EmotionAPICallCount++;
-                //emotionResult = await _emotionClient.RecognizeAsync(jpg);
-                //Properties.Settings.Default.EmotionAPICallCount++;
 
             }
             catch (Exception e)
@@ -306,6 +318,7 @@ namespace LiveCameraSample
 
                 visImage = Visualization.DrawFaces(visImage, result.Faces, result.EmotionScores);
                 visImage = Visualization.DrawTags(visImage, result.Tags);
+
             }
 
             return visImage;

@@ -44,6 +44,8 @@ using Microsoft.ProjectOxford.Common.Contract;
 using Microsoft.ProjectOxford.Emotion.Contract;
 using Microsoft.ProjectOxford.Face.Contract;
 using Microsoft.ProjectOxford.Vision.Contract;
+using System.Windows.Controls;
+using System.Threading;
 
 namespace LiveCameraSample
 {
@@ -75,16 +77,40 @@ namespace LiveCameraSample
         }
 
         //TODO Hackathon: provide a function to draw the ad here
-        public static BitmapSource DrawAds(BitmapSource baseImage, BitmapSource bmp)
+        public static BitmapSource DrawAds(System.Windows.Controls.Image originalImage, BitmapSource bmp)
         {
-        
-            Action<DrawingContext, double> drawAction = (drawingContext, annotationScale) =>
+            MainWindow.showingAd = true;
+
+            //ImageSource originalImageSourceCopy = originalImage.Source.Clone();
+
+    //        originalImage.Dispatcher.BeginInvoke(
+    //(Action)(() => { originalImage.Source = bmp; }));
+
+            originalImage.Source = bmp;
+
+            
+
+            new Thread(() =>
             {
-                double y = 0;
-                
-                y += 42 * annotationScale;
-                
-            };
+                Thread.Sleep(2000);
+                //originalImage.Source = originalImageSourceCopy;
+                MainWindow.showingAd = false;
+            }).Start();
+
+            //var adImage = new System.Windows.Controls.Image();
+            //adImage.Margin = originalImage.Margin;
+            //var parent = originalImage.Parent as Grid;
+
+            //parent.Children.Add(adImage);
+
+
+            //Action<DrawingContext, double> drawAction = (drawingContext, annotationScale) =>
+            //{
+            //    double y = 0;
+
+            //    y += 42 * annotationScale;
+
+            //};
 
             return bmp;
         }
