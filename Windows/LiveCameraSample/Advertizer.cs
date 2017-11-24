@@ -60,7 +60,7 @@ namespace LiveCameraSample
 
             Console.WriteLine("Smile: " + smile);
 
-            if (smile > 0.975)
+            if (smile > 0.99)
             {
                 return prefix + "X-EM-S";
             }
