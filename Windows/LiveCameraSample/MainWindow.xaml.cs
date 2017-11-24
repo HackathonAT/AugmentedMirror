@@ -198,7 +198,7 @@ namespace LiveCameraSample
             var result = new LiveCameraResult();
             try
             {
-                var attrs = new List<FaceAttributeType> { FaceAttributeType.Age, FaceAttributeType.Gender, FaceAttributeType.HeadPose, FaceAttributeType.Glasses };
+                var attrs = new List<FaceAttributeType> { FaceAttributeType.Age, FaceAttributeType.Gender, FaceAttributeType.Glasses, FaceAttributeType.FacialHair, FaceAttributeType.Emotion};  
                 result.Faces = await _faceClient.DetectAsync(jpg, returnFaceAttributes: attrs);
             }
             catch (FaceAPIException faceException)
