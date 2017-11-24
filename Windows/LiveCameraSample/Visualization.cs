@@ -90,12 +90,12 @@ namespace LiveCameraSample
 
             
 
-            new Thread(() =>
-            {
-                Thread.Sleep(2000);
-                //originalImage.Source = originalImageSourceCopy;
-                MainWindow.showingAd = false;
-            }).Start();
+            //new Thread(() =>
+            //{
+            //    Thread.Sleep(2000);
+            //    //originalImage.Source = originalImageSourceCopy;
+            //    MainWindow.showingAd = false;
+            //}).Start();
 
             //var adImage = new System.Windows.Controls.Image();
             //adImage.Margin = originalImage.Margin;

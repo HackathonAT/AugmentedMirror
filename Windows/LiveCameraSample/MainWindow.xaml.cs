@@ -164,7 +164,7 @@ namespace LiveCameraSample
 
                         //**************************************************************
                         //added
-                        if(_latestResultsToDisplay.Faces != null && _latestResultsToDisplay.Faces.Length > 0)
+                        if(_latestResultsToDisplay.Faces != null && _latestResultsToDisplay.Faces.Length > 0 && _mode == AppMode.Faces)
                         {
 
                             //var currentEmotion = _latestResultsToDisplay.Faces[0].FaceAttributes.Emotion;
