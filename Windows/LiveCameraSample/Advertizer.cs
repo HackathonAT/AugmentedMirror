@@ -32,19 +32,22 @@ namespace LiveCameraSample
          * "MRO-F-SG--" Female with Sunglasses
          * If you invoke the GetHybrisData("MRO-M20-40"), the method will return a String containing the URL 
          *    of an image of the ad for middle aged men.
+         *    
+         * "MRO-M-FH-B" facial hair bearded
+         * 
          */
     static class Advertizer
     {
         internal static void ShowHybrisAdvertizing(Microsoft.ProjectOxford.Face.Contract.FaceAttributes faceAttributes, System.Windows.Controls.Image rightImage)
         {
             //Hackathon: call this method with the information from Azure Face API, create a Request to Hybris and show the ad.
-            String targetGroup = GetTargetGroup(faceAttributes.Age, faceAttributes.Gender, faceAttributes.Glasses);
+            String targetGroup = GetTargetGroup(faceAttributes.Age, faceAttributes.Gender, faceAttributes.Glasses, faceAttributes.FacialHair);
             String hybrisResponseImageURL = HybrisRest.GetHybrisData(targetGroup);
             Console.WriteLine("Showing Ad from URL: " + hybrisResponseImageURL);
             ShowAd(hybrisResponseImageURL, rightImage);
         }
 
-        internal static String GetTargetGroup(double exactAge, String gender, Microsoft.ProjectOxford.Face.Contract.Glasses glasses)
+        internal static String GetTargetGroup(double exactAge, String gender, Microsoft.ProjectOxford.Face.Contract.Glasses glasses, FacialHair facialHair)
         {
             //Hackathon: prepare the Target-Group-String for the Hybris REST call: HybrisRest.GetHybrisData(Target-Group-String)
             String prefix = "MRO-";
@@ -59,14 +62,22 @@ namespace LiveCameraSample
             {
                 return prefix + genderSyllable + "-RG--";
             }
-                
+            Console.WriteLine("Beard: " +  facialHair.Beard);
+            Console.WriteLine("Moustache: " + facialHair.Moustache);
+            Console.WriteLine("Sideburns: " + facialHair.Sideburns);
+            if (genderSyllable.Equals("M") && facialHair.Beard > 0.5)
+            {
+                return prefix + genderSyllable + "-FH-B";
+            }
+
             if (exactAge < 20)
             {
                 ageGroup = "00-20";
             }
             else if (exactAge < 40)
             {
-                ageGroup = "20-40";
+                //FIXME No Picure, just for testing put to another value!
+                ageGroup = "40-60";
             }
             else if (exactAge < 60)
             {
