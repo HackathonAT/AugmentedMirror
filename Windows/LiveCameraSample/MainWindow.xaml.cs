@@ -115,6 +115,7 @@ namespace LiveCameraSample
 
                         RightImage.Source = VisualizeResult(e.Frame);
                     }
+
                 }));
 
                 // See if auto-stop should be triggered. 
@@ -174,6 +175,8 @@ namespace LiveCameraSample
                         {
                             RightImage.Source = VisualizeResult(e.Frame);
                         }
+
+
                     }
                 }));
             };
