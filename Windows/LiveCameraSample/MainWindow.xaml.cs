@@ -169,6 +169,7 @@ namespace LiveCameraSample
 
                             //var currentEmotion = _latestResultsToDisplay.Faces[0].FaceAttributes.Emotion;
                             //Console.Write("Anger: " + currentEmotion.Anger);
+                            Console.Write("Smile: " + _latestResultsToDisplay.Faces[0].FaceAttributes.Smile);
                             Advertizer.ShowHybrisAdvertizing(_latestResultsToDisplay.Faces[0].FaceAttributes, RightImage);
                         }
                             
@@ -201,7 +202,7 @@ namespace LiveCameraSample
             var result = new LiveCameraResult();
             try
            { 
-                var attrs = new List<FaceAttributeType> { FaceAttributeType.Age, FaceAttributeType.Gender, FaceAttributeType.Glasses, FaceAttributeType.FacialHair, FaceAttributeType.Emotion};  
+                var attrs = new List<FaceAttributeType> { FaceAttributeType.Age, FaceAttributeType.Gender, FaceAttributeType.Glasses, FaceAttributeType.FacialHair, FaceAttributeType.Emotion, FaceAttributeType.Smile};  
                 result.Faces = await _faceClient.DetectAsync(jpg, returnFaceAttributes: attrs);
             }
             catch (FaceAPIException faceException)
