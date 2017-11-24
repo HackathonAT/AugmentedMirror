@@ -112,7 +112,7 @@ namespace LiveCameraSample
                     // new frame now with the most recent analysis available. 
                     if (_fuseClientRemoteResults && !showingAd)
                     {
-
+                        
                         RightImage.Source = VisualizeResult(e.Frame);
                     }
 
@@ -166,6 +166,9 @@ namespace LiveCameraSample
                         //added
                         if(_latestResultsToDisplay.Faces != null && _latestResultsToDisplay.Faces.Length > 0)
                         {
+
+                            //var currentEmotion = _latestResultsToDisplay.Faces[0].FaceAttributes.Emotion;
+                            //Console.Write("Anger: " + currentEmotion.Anger);
                             Advertizer.ShowHybrisAdvertizing(_latestResultsToDisplay.Faces[0].FaceAttributes, RightImage);
                         }
                             
@@ -197,7 +200,7 @@ namespace LiveCameraSample
             // Submit image to API. 
             var result = new LiveCameraResult();
             try
-            {
+           { 
                 var attrs = new List<FaceAttributeType> { FaceAttributeType.Age, FaceAttributeType.Gender, FaceAttributeType.Glasses, FaceAttributeType.FacialHair, FaceAttributeType.Emotion};  
                 result.Faces = await _faceClient.DetectAsync(jpg, returnFaceAttributes: attrs);
             }
