@@ -109,7 +109,9 @@ namespace LiveCameraSample
                 ageGroup = "40-60";
             } else
             {
-                Console.WriteLine("Error regarding Agegroup: ", exactAge, " is bigger than 60");
+                ageGroup = "40-60";
+                Console.WriteLine("Error regarding Agegroup: " +  exactAge + " is bigger than 60");
+                Console.WriteLine("Error regarding Agegroup: Changing to agegroup 40-60");
             }
             Console.WriteLine("Result of GetTargetGroup: ", prefix + genderSyllable + ageGroup);
             return prefix + genderSyllable + ageGroup;
