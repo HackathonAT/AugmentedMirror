@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.ProjectOxford.Face.Contract;
 using System.Windows.Controls;
+using Microsoft.ProjectOxford.Common.Contract;
 
 namespace LiveCameraSample
 {
@@ -35,24 +36,48 @@ namespace LiveCameraSample
          *    
          * "MRO-M-FH-B" facial hair bearded
          * 
+         * "MRO-X-EM-A" Angry Face
+         * "MRO-X-EM-S" Smiling Face
+         * 
          */
     static class Advertizer
     {
         internal static void ShowHybrisAdvertizing(Microsoft.ProjectOxford.Face.Contract.FaceAttributes faceAttributes, System.Windows.Controls.Image rightImage)
         {
             //Hackathon: call this method with the information from Azure Face API, create a Request to Hybris and show the ad.
-            String targetGroup = GetTargetGroup(faceAttributes.Age, faceAttributes.Gender, faceAttributes.Glasses, faceAttributes.FacialHair);
+            String targetGroup = GetTargetGroup(faceAttributes.Age, faceAttributes.Gender, faceAttributes.Glasses, faceAttributes.FacialHair, faceAttributes.Emotion, faceAttributes.Smile);
             String hybrisResponseImageURL = HybrisRest.GetHybrisData(targetGroup);
             Console.WriteLine("Showing Ad from URL: " + hybrisResponseImageURL);
             ShowAd(hybrisResponseImageURL, rightImage);
         }
 
-        internal static String GetTargetGroup(double exactAge, String gender, Microsoft.ProjectOxford.Face.Contract.Glasses glasses, FacialHair facialHair)
+        internal static String GetTargetGroup(double exactAge, String gender, Microsoft.ProjectOxford.Face.Contract.Glasses glasses, FacialHair facialHair, EmotionScores emotion, double smile)
         {
             //Hackathon: prepare the Target-Group-String for the Hybris REST call: HybrisRest.GetHybrisData(Target-Group-String)
             String prefix = "MRO-";
             String genderSyllable = gender.ToLower().StartsWith("m") ? "M" : "F";
             String ageGroup = "";
+
+            Console.WriteLine("Smile: " + smile);
+
+            if (smile > 0.975)
+            {
+                return prefix + "X-EM-S";
+            }
+
+            Console.WriteLine("Anger: " + emotion.Anger);
+            Console.WriteLine("Contempt: " + emotion.Contempt);
+            Console.WriteLine("Disgust: " + emotion.Disgust);
+            Console.WriteLine("Fear: " + emotion.Fear);
+            Console.WriteLine("Happiness: " + emotion.Happiness);
+            Console.WriteLine("Neutral: " + emotion.Neutral);
+            Console.WriteLine("Sadness: " + emotion.Sadness);
+            Console.WriteLine("Surprise: " + emotion.Surprise);
+
+            if (emotion.Anger > 0.5)
+            {
+                return prefix + "X-EM-A";
+            }
 
             if ((int)glasses == 1)
             {
@@ -62,6 +87,7 @@ namespace LiveCameraSample
             {
                 return prefix + genderSyllable + "-RG--";
             }
+
             Console.WriteLine("Beard: " +  facialHair.Beard);
             Console.WriteLine("Moustache: " + facialHair.Moustache);
             Console.WriteLine("Sideburns: " + facialHair.Sideburns);
@@ -76,8 +102,7 @@ namespace LiveCameraSample
             }
             else if (exactAge < 40)
             {
-                //FIXME No Picure, just for testing put to another value!
-                ageGroup = "40-60";
+                ageGroup = "20-40";
             }
             else if (exactAge < 60)
             {
@@ -92,38 +117,8 @@ namespace LiveCameraSample
 
         internal static void ShowAd(String hybrisResponse, System.Windows.Controls.Image rightImage)
         {
-            //TODO Hackathon: show the ad in the user interface.
-            //System.Net.WebClient client = new System.Net.WebClient();
-            //Stream stream = client.OpenRead(hybrisResponse);
-            //Bitmap bitmap; bitmap = new Bitmap(stream);
-            //BitmapSource bitmapSource = null;
-
-
-            //if (bitmap != null)
-            //{
-            //    Console.WriteLine("Bitmap not null! " + bitmap.Size.ToString());
-            //    BitmapData bitmapData = bitmap.LockBits(
-            //        new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
-            //        System.Drawing.Imaging.ImageLockMode.ReadOnly, bitmap.PixelFormat);
-
-            //    bitmapSource = BitmapSource.Create(
-            //        bitmapData.Width, bitmapData.Height,
-            //        bitmap.HorizontalResolution, bitmap.VerticalResolution,
-            //        PixelFormats.Bgr24, null,
-            //        bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
-
-            //    bitmap.UnlockBits(bitmapData);
-
-            //TODO Hackathon display image
-            //Visualization.DrawAds(???, bitmapSource);
+            //Hackathon: show the ad in the user interface.
             Visualization.DrawAds(rightImage, new BitmapImage(new Uri(hybrisResponse)));
-            //}
-
-
-            //stream.Flush();
-            //stream.Close();
-            //client.Dispose();
-
     }
     }
 }
